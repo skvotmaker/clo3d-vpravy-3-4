@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="uk"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Брак-контроль — CLO 3D, Заняття 3–4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+:root{
+  --asphalt:#15171A;
+  --concrete:#1E2227;
+  --concrete-2:#272C33;
+  --chalk:#EDEDE8;
+  --dim:#98A0A8;
+  --hivis:#D8FF33;
+  --flag:#FF5A2C;
+  --ok:#8BE05A;
+  --stitch:rgba(237,237,232,.22);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Inter',system-ui,sans-serif;color:var(--chalk);
+  background-color:var(--asphalt);
+  background-image:
+    repeating-linear-gradient(45deg, rgba(255,255,255,.014) 0 2px, transparent 2px 5px),
+    radial-gradient(ellipse at 20% -10%, rgba(216,255,51,.07), transparent 55%);
+  min-height:100vh;line-height:1.55;padding:16px 14px 60px;
+}
+.wrap{max-width:860px;margin:0 auto}
+h1,h2,h3{font-family:'Oswald',sans-serif;font-weight:700;letter-spacing:.01em;line-height:1}
+.mono{font-family:'IBM Plex Mono',monospace}
+.tag{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+
+/* ---------- header ---------- */
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;
+  border-bottom:2px solid var(--chalk);padding-bottom:12px;margin-bottom:14px}
+.head h1{font-size:clamp(28px,7.5vw,50px);text-transform:uppercase}
+.head h1 em{font-style:normal;color:var(--hivis)}
+.head .sub{margin-top:5px}
+.head-meta{display:flex;gap:8px}
+.hm-cell{border:1.5px solid var(--stitch);padding:6px 11px;min-width:78px}
+.hm-cell .tag{font-size:9px;letter-spacing:.16em}
+.hm-cell b{display:block;font-family:'Oswald',sans-serif;font-size:19px;font-weight:600;color:var(--chalk);line-height:1.1}
+
+/* ---------- лампас ---------- */
+.lampas{margin:0 0 22px}
+.lampas-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.lampas-body{border-top:1px solid var(--stitch);border-bottom:1px solid var(--stitch);padding:4px 0}
+.stripes{display:flex;gap:3px}
+.stripe{flex:1;min-width:0;height:16px;background:var(--concrete-2);transition:background .25s}
+.stripe.on{background:var(--hivis)}
+.stripe.no{background:var(--flag)}
+.stripe.cur{background:var(--concrete-2);box-shadow:inset 0 0 0 2px var(--hivis)}
+
+/* ---------- panels ---------- */
+.panel{background:var(--concrete);border:1px solid var(--stitch);padding:24px 22px;margin-bottom:16px;position:relative}
+.panel.stitched::after{content:'';position:absolute;inset:6px;border:1px dashed var(--stitch);pointer-events:none}
+@media(max-width:520px){.panel{padding:20px 16px}}
+
+/* ---------- intro ---------- */
+.hero{display:grid;grid-template-columns:1fr 240px;gap:24px;align-items:center}
+@media(max-width:680px){.hero{grid-template-columns:1fr}.hero-art{order:-1;max-width:210px;margin:0 auto}}
+.hero h2{font-size:clamp(24px,6vw,38px);text-transform:uppercase;margin:8px 0 12px}
+.hero h2 em{font-style:normal;color:var(--hivis)}
+.lead{font-size:16px;color:var(--dim)}
+.lead b{color:var(--chalk);font-weight:600}
+
+/* care label */
+.carelabel{border:1px solid var(--stitch);background:var(--concrete-2);padding:14px 16px;margin-top:20px}
+.carelabel .cl-top{display:flex;align-items:center;gap:12px;border-bottom:1px dashed var(--stitch);padding-bottom:10px;margin-bottom:10px}
+.carelabel .cl-icons{display:flex;gap:9px}
+.carelabel ul{list-style:none}
+.carelabel li{position:relative;padding-left:18px;font-size:13.5px;color:var(--dim);margin-bottom:6px;line-height:1.45}
+.carelabel li:last-child{margin-bottom:0}
+.carelabel li::before{content:'';position:absolute;left:0;top:9px;width:9px;height:2px;background:var(--hivis)}
+
+.ranks-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:18px;align-items:center}
+.rk{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  border:1px solid var(--stitch);padding:4px 8px;color:var(--dim)}
+.rk.arrow{border:none;padding:4px 1px;color:var(--stitch)}
+.rk.top{border-color:var(--hivis);color:var(--hivis)}
+
+/* ---------- buttons ---------- */
+.btn{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--hivis);color:var(--asphalt);border:none;padding:14px 30px;cursor:pointer;transition:transform .1s,filter .15s}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(2px)}
+.btn.dark{background:var(--chalk);color:var(--asphalt)}
+.btn.ghost{background:transparent;color:var(--chalk);border:1.5px solid var(--stitch);font-size:13px;padding:10px 20px}
+.btn.ghost:hover{border-color:var(--chalk);filter:none}
+.btn:focus-visible,.opt:focus-visible,.check-item:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2.5px solid var(--hivis);outline-offset:3px}
+
+/* ---------- defect card ---------- */
+.q-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.q-num{font-family:'Oswald',sans-serif;font-size:38px;font-weight:700;line-height:.9;color:var(--hivis)}
+.q-num small{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:var(--dim);font-weight:400}
+.chip{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  border:1px solid var(--stitch);padding:5px 10px;color:var(--dim)}
+.symptom{font-size:17.5px;line-height:1.45;border-left:3px solid var(--flag);padding:6px 0 6px 16px;margin:14px 0 22px}
+@media(max-width:520px){.symptom{font-size:16px}}
+.ask{font-family:'Oswald',sans-serif;font-size:15px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:start;width:100%;text-align:left;
+  font-family:'Inter',sans-serif;font-size:15px;line-height:1.4;color:var(--chalk);
+  background:var(--concrete-2);border:1.5px solid transparent;padding:13px 14px;cursor:pointer;
+  transition:border-color .13s,background .13s}
+.opt:hover:not(:disabled){border-color:var(--chalk)}
+.opt:disabled{cursor:default}
+.opt .key{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--dim);
+  border:1px solid var(--stitch);width:24px;height:24px;display:grid;place-items:center}
+.opt.correct{border-color:var(--hivis);background:rgba(216,255,51,.09)}
+.opt.correct .key{background:var(--hivis);border-color:var(--hivis);color:var(--asphalt)}
+.opt.correct .key::after{content:'✓'}
+.opt.correct .key span{display:none}
+.opt.wrong{border-color:var(--flag);background:rgba(255,90,44,.09)}
+.opt.wrong .key{background:var(--flag);border-color:var(--flag);color:#fff}
+.opt.wrong .key::after{content:'✕'}
+.opt.wrong .key span{display:none}
+.opt.dim{opacity:.4}
+
+.verdict{margin-top:22px;animation:up .28s ease}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.vstamp{display:inline-block;font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;padding:7px 15px;margin-bottom:14px}
+.vstamp.ok{background:var(--hivis);color:var(--asphalt)}
+.vstamp.no{background:var(--flag);color:#fff}
+.vnote{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--dim);margin-bottom:14px;line-height:1.6}
+.vnote b{color:var(--chalk);font-weight:600}
+.why{background:var(--concrete-2);border-left:3px solid var(--hivis);padding:14px 16px;font-size:15px;line-height:1.6;color:var(--dim)}
+.why .why-tag{margin-bottom:6px}
+.why b{color:var(--chalk)}
+.lesson-link{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-family:'IBM Plex Mono',monospace;
+  font-size:11.5px;letter-spacing:.06em;color:var(--hivis);text-decoration:none;border-bottom:1px solid var(--stitch);padding-bottom:2px}
+.lesson-link:hover{border-color:var(--hivis)}
+.lesson-link.static{color:var(--dim);cursor:default}
+.q-foot{margin-top:24px;display:flex;justify-content:flex-end}
+
+/* ---------- result ---------- */
+.result-top{text-align:center}
+.woven{display:inline-block;border:2px solid var(--hivis);padding:18px 34px 16px;margin-bottom:20px;position:relative}
+.woven::before,.woven::after{content:'';position:absolute;top:-2px;bottom:-2px;width:9px;background:
+  repeating-linear-gradient(0deg,var(--hivis) 0 3px,transparent 3px 6px)}
+.woven::before{left:-14px}.woven::after{right:-14px}
+.woven .w-tag{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
+.woven .w-rank{font-family:'Oswald',sans-serif;font-size:clamp(22px,5.5vw,34px);font-weight:700;text-transform:uppercase;color:var(--hivis);margin:4px 0;line-height:1.05}
+.woven .w-score{font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:.12em;color:var(--chalk)}
+.rank-desc{font-size:16px;color:var(--dim);max-width:540px;margin:0 auto}
+
+.bars{display:grid;gap:12px}
+.bar-row{display:grid;grid-template-columns:1fr 62px;gap:12px;align-items:center}
+.bar-name{font-size:13.5px;color:var(--dim)}
+.bar-name span{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;color:var(--hivis);margin-right:7px}
+.bar-track{height:7px;background:var(--concrete-2);position:relative;margin-top:6px}
+.bar-fill{position:absolute;left:0;top:0;bottom:0;background:var(--hivis)}
+.bar-fill.low{background:var(--flag)}
+.bar-score{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--dim);text-align:right}
+
+.rev{list-style:none}
+.rev li{border-bottom:1px dashed var(--stitch);padding:12px 0}
+.rev li:last-child{border-bottom:none}
+.rev .rv-t{font-size:15px;font-weight:600;display:block;margin-bottom:3px}
+.rev .rv-w{font-size:13.5px;color:var(--dim)}
+
+.proto{width:100%;border-collapse:collapse;font-size:13.5px}
+.proto th{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--dim);text-align:left;padding:0 8px 9px 0;border-bottom:1px solid var(--stitch);font-weight:400}
+.proto td{padding:10px 8px 10px 0;border-bottom:1px dashed var(--stitch);vertical-align:top;color:var(--dim)}
+.proto td:nth-child(3){color:var(--chalk)}
+.proto td:first-child{font-family:'IBM Plex Mono',monospace;font-size:11px;width:30px}
+.proto .mk{font-family:'IBM Plex Mono',monospace;font-weight:600;width:24px}
+.proto .mk.ok{color:var(--hivis)}
+.proto .mk.no{color:var(--flag)}
+@media(max-width:560px){
+  .proto,.proto tbody,.proto tr,.proto td{display:block;width:100%}
+  .proto thead{display:none}
+  .proto tr{border-bottom:1px dashed var(--stitch);padding:10px 0}
+  .proto td{border:none;padding:1px 0}
+  .proto td:first-child,.proto .mk{display:inline-block;width:auto;margin-right:8px}
+}
+.check-item{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:none;border:none;
+  border-bottom:1px dashed var(--stitch);padding:13px 0;cursor:pointer;font-family:'Inter',sans-serif;color:var(--chalk)}
+.check-item:last-child{border-bottom:none}
+.check-box{width:20px;height:20px;border:1.5px solid var(--stitch);flex-shrink:0;display:grid;place-items:center;margin-top:2px}
+.check-item.on .check-box{background:var(--hivis);border-color:var(--hivis)}
+.check-item.on .check-box::after{content:'✓';color:var(--asphalt);font-size:13px;font-weight:700;line-height:1}
+.check-text{font-size:14.5px;line-height:1.45}
+.check-text small{display:block;font-size:12.5px;color:var(--dim);margin-top:2px}
+.check-item.on .check-text b{text-decoration:line-through;color:var(--dim)}
+.check-text b{font-weight:600}
+.actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+.foot{text-align:center;margin-top:24px}
+.hidden{display:none!important}
+
+/* ---------- editor ---------- */
+.editbar{position:sticky;top:0;z-index:40;background:var(--hivis);color:var(--asphalt);padding:11px 16px;
+  margin:-16px -14px 18px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.editbar .eb-t{font-family:'Oswald',sans-serif;font-size:15px;letter-spacing:.12em;text-transform:uppercase;margin-right:auto}
+.editbar .eb-t small{display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;opacity:.7;text-transform:none}
+.eb-btn{font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+  background:transparent;color:var(--asphalt);border:1.5px solid rgba(21,23,26,.45);padding:7px 13px;cursor:pointer}
+.eb-btn:hover{background:rgba(21,23,26,.1)}
+.eb-btn.primary{background:var(--asphalt);color:var(--hivis);border-color:var(--asphalt)}
+.eb-status{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.06em;width:100%;opacity:.8}
+.ed-sec{margin-bottom:26px}
+.ed-sec>h3{font-size:19px;text-transform:uppercase;color:var(--hivis);letter-spacing:.05em;margin-bottom:4px}
+.ed-sec>.ed-hint{font-size:13.5px;color:var(--dim);margin-bottom:14px}
+.ed-card{background:var(--concrete);border:1px solid var(--stitch);padding:18px;margin-bottom:14px}
+.ed-card.invalid{border-color:var(--flag);border-width:2px}
+.ed-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.ed-idx{font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;background:var(--hivis);color:var(--asphalt);padding:4px 9px;letter-spacing:.08em}
+.ed-tools{margin-left:auto;display:flex;gap:5px}
+.ed-tool{font-family:'IBM Plex Mono',monospace;font-size:12px;background:transparent;border:1px solid var(--stitch);
+  color:var(--chalk);width:28px;height:28px;cursor:pointer;display:grid;place-items:center;padding:0}
+.ed-tool:hover:not(:disabled){border-color:var(--chalk)}
+.ed-tool.danger{color:var(--flag);border-color:rgba(255,90,44,.5)}
+.ed-tool:disabled{opacity:.3;cursor:default}
+.ed-field{margin-bottom:12px}
+.ed-field>label{display:block;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:5px}
+.ed-field input,.ed-field textarea,.ed-field select{width:100%;font-family:'Inter',sans-serif;font-size:14.5px;
+  color:var(--chalk);background:var(--concrete-2);border:1px solid var(--stitch);padding:9px 11px;line-height:1.45}
+.ed-field textarea{resize:vertical;min-height:72px}
+.ed-field input:focus,.ed-field textarea:focus,.ed-field select:focus{border-color:var(--hivis)}
+.ed-field select option{background:var(--concrete-2);color:var(--chalk)}
+.ed-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.ed-row{grid-template-columns:1fr}}
+.ed-optrow{display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;margin-bottom:7px}
+.ed-optrow input[type=text]{width:100%;font-family:'Inter',sans-serif;font-size:14.5px;background:var(--concrete-2);
+  border:1px solid var(--stitch);padding:9px 11px;color:var(--chalk)}
+.ed-optrow.is-correct input[type=text]{border-color:var(--hivis)}
+.ed-radio{position:relative;display:grid;place-items:center;width:30px;height:30px;border:1px solid var(--stitch);cursor:pointer;background:var(--concrete-2)}
+.ed-radio input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.ed-radio:focus-within{outline:2.5px solid var(--hivis);outline-offset:2px}
+.ed-optrow.is-correct .ed-radio{background:var(--hivis);border-color:var(--hivis)}
+.ed-optrow.is-correct .ed-radio::after{content:'✓';color:var(--asphalt);font-size:14px;font-weight:700}
+.ed-legend{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.ed-warn{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--flag);margin-top:8px}
+.ed-add{width:100%;border:1.5px dashed var(--stitch);background:transparent;color:var(--chalk);
+  font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.1em;text-transform:uppercase;padding:12px;cursor:pointer}
+.ed-add:hover{border-color:var(--hivis);color:var(--hivis)}
+.ed-guide{background:var(--concrete);border-left:3px solid var(--hivis);padding:14px 16px;margin-bottom:24px;font-size:14.5px;color:var(--dim)}
+.ed-guide code{font-family:'IBM Plex Mono',monospace;font-size:13px;background:var(--concrete-2);padding:1px 5px;color:var(--hivis)}
+.ed-guide ol{margin:8px 0 0 20px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- ВЕСЬ ТЕКСТ ГРИ ЖИВЕ ТУТ. Редагувати через ?edit у кінці адреси. -->
+<script type="application/json" id="gameConfig">
+{
+  "meta": {
+    "title": "Брак-",
+    "titleAccent": "контроль",
+    "subtitle": "Заняття 3–4 · Streetwear: Худі та Штани",
+    "heroHeading": "Знайди інструмент",
+    "heroHeadingAccent": "під дефект",
+    "heroLead": "Костюм вийшов з дефектом. Ти бачиш тільки симптом — капюшон без швів, кишеня, яку нічим пришити, манжет, що звисає, принт із білим квадратом навколо. Твоє завдання: назвати інструмент CLO, який це лікує.",
+    "startLabel": "Почати огляд",
+    "footNote": "Курс CLO 3D · Заняття 3–4 · Матеріал для самоперевірки",
+    "fileName": "index.html",
+    "pageTitle": "Брак-контроль — CLO 3D, Заняття 3–4",
+    "lampasLabel": "Оглянуто"
+  },
+  "rules": [
+    "Один дефект — чотири інструменти, правильний один.",
+    "Відповідь незворотна.",
+    "Після кожного дефекту — розбір і посилання на тему заняття.",
+    "У фіналі — звання, теми на повторення і чек-ліст ДЗ №3."
+  ],
+  "blocks": {
+    "1": "Збирання верху",
+    "2": "Деталі й фурнітура",
+    "3": "Об'єм трикотажу",
+    "4": "Принт і шари"
+  },
+  "topics": {
+    "t_sew": {
+      "title": "Заняття 3 · Зшивання, симетрія та Merge",
+      "url": ""
+    },
+    "t_trim": {
+      "title": "Заняття 3 · Кишеня-кенгуру, блискавка, манжети",
+      "url": ""
+    },
+    "t_volume": {
+      "title": "Заняття 3 · Elastic та Render Thickness",
+      "url": ""
+    },
+    "t_print": {
+      "title": "Заняття 4 · Принти й текстури (Graphic, Object Browser)",
+      "url": ""
+    },
+    "t_layer": {
+      "title": "Заняття 4 · Layering: порядок шарів у Property Editor",
+      "url": ""
+    }
+  },
+  "steps": [
+    {
+      "id": "k1",
+      "block": 1,
+      "topic": "t_sew",
+      "topicName": "Free Sewing для складної розбивки зрізів",
+      "situation": "Зшиваєш стійку коміра з горловиною. Розбивка точками на обох деталях повністю співпадає — однакова кількість точок, розташованих у тих самих місцях. Потрібно зашити весь зріз одразу, а не проводити лінію вручну.",
+      "ask": "Чим шиєш?",
+      "options": [
+        "Edit Sewing — редагувати вже існуючий шов: змінювати чи перепризначати з'єднані точки",
+        "Segment Sewing — послідовно клацнути відповідні точки, і кожен сегмент між ними зшивається автоматично",
+        "Merge — об'єднує кілька виділених точок лекала в одну",
+        "Trace — копіює контур зрізу з однієї деталі на іншу"
+      ],
+      "correct": 1,
+      "explain": "Merge і Trace одразу відпадають — вони не виконують дію зшивання, а редагують чи копіюють геометрію лекала. Edit Sewing теж не підходить: він призначений для зміни вже існуючого зшивання (наприклад, якщо шов зроблено неправильно і точки треба перепризначити), а в цій ситуації шва ще немає — його треба створити з нуля. Оскільки точки на обох деталях уже збігаються і потрібне саме автоматичне зшивання по точках — це прямий випадок для Segment Sewing."
+    },
+    {
+      "id": "k2",
+      "block": 1,
+      "topic": "t_sew",
+      "topicName": "Symmetric Pattern (With Sewing)",
+      "situation": "Зшив/-ла половину худі, зробив/-ла дзеркальну копію. На другій половині швів немає — при симуляції вона розлітається.",
+      "ask": "У чому помилка?",
+      "options": [
+        "Дзеркалити треба через Symmetric Pattern (With Sewing) — копія переносить і шви",
+        "Другу половину треба було створити через Trace, скопіювавши контур зрізу",
+        "Копію треба створювати через Layer Clone",
+        "Другу половину завжди дошивають вручну, це нормально"
+      ],
+      "correct": 0,
+      "explain": "У Symmetric Pattern два режими. Звичайне дзеркалення дає тільки геометрію — тому половина й розлітається. Варіант With Sewing переносить лінії зшивання й лишає зв'язок між половинами: правиш одну — друга оновлюється сама. Trace і Layer Clone тут не підходять взагалі, бо жоден з них не працює з дзеркальним відображенням лекала разом зі швами — це інструменти для інших задач (копіювання контуру і дублювання шару відповідно). Дошивати вручну можна, але тоді кожна правка лекала робиться двічі, що суперечить суті симетричного дзеркалення."
+    },
+    {
+      "id": "k3",
+      "block": 1,
+      "topic": "t_sew",
+      "topicName": "Merge центрального шва",
+      "situation": "Половини спинки зійшлися, але по центру видно шов і залом уздовж нього. У лекалі спинка цільнокроєна — такого шва там немає.",
+      "ask": "Чим прибираєш?",
+      "options": [
+        "Merge по центральному шву — злити половини в одну деталь",
+        "Видалити одну половину й розтягнути другу",
+        "Cut & Sew по центральній лінії",
+        "Зменшити Particle Distance у зоні шва"
+      ],
+      "correct": 0,
+      "explain": "Дзеркальна копія приходить окремою деталлю, тож по центру утворюється шов, якого в лекалі немає — а будь-який шов у CLO дає залом. Merge зливає половини в одну суцільну деталь, і залом зникає. Обов'язковий крок скрізь, де конструкція цільнокроєна: спинка, капюшон, пояс."
+    },
+    {
+      "id": "k4",
+      "block": 2,
+      "topic": "t_trim",
+      "topicName": "Trace для накладної кишені",
+      "situation": "Контур кишені-кенгуру намальований на пілочці через Internal Line. Але це лише лінія: окремої деталі немає, пришивати нічого.",
+      "ask": "Що далі?",
+      "options": [
+        "Trace — відокремити контур у нову деталь і пришити її поверх пілочки",
+        "Cut & Sew — розрізати пілочку по контуру кишені",
+        "Layer Clone (Over) на пілочці",
+        "Merge контуру з пілочкою"
+      ],
+      "correct": 0,
+      "explain": "Internal Line лише розмічає контур. Trace копіює його в окрему деталь, яку вже можна пришити зверху — так робиться накладна кишеня. Cut & Sew дав би протилежне: розрізав би пілочку по контуру, і замість кишені ти отримав/-ла б діру зі швом."
+    },
+    {
+      "id": "k5",
+      "block": 2,
+      "topic": "t_trim",
+      "topicName": "Layer Clone для подвійного манжета",
+      "situation": "Манжет має бути з двох шарів тканини — лице й підкладка, як у реальному худі. Зараз це один тонкий шар, край виглядає порожнім.",
+      "ask": "Чим робиш другий шар?",
+      "options": [
+        "Layer Clone (Under / Over) — прив'язана копія деталі під нею або над нею",
+        "Render Thickness — задати манжету товщину 4 мм",
+        "Скопіювати деталь звичайним копіюванням і посунути",
+        "Elastic — стягнути манжет удвічі"
+      ],
+      "correct": 0,
+      "explain": "Layer Clone створює копію, прив'язану до оригіналу й розташовану під ним або над ним — так робиться подвійний манжет, обшивка чи пояс. Render Thickness тут не рятує: він додає візуальну товщину одному шару, а не другий шар тканини. Звичайна копія не прив'язана — при правці лекала поїде окремо."
+    },
+    {
+      "id": "k6",
+      "block": 2,
+      "topic": "t_trim",
+      "topicName": "Property Editor для вигляду блискавки",
+      "situation": "Блискавка вшита і працює, але виглядає як пластикова смужка: зубці дрібні й матові, а треба великий металевий трактор.",
+      "ask": "Куди йдеш?",
+      "options": [
+        "У Property Editor блискавки — колір, матовість, металевий блиск, розмір зубців",
+        "В Object Browser, вкладка Fabric — призначити блискавці іншу тканину",
+        "Видалити блискавку й вставити іншу через Zipper",
+        "Нанести металевий блиск через інструмент Graphic"
+      ],
+      "correct": 0,
+      "explain": "Zipper вставляє механіку — тасьму, зубці, бігунок. Вигляд живе окремо, у Property Editor: колір, матовість, металевий блиск, розмір зубців. Та сама логіка, що з лекалом і тканиною: інструмент створює об'єкт, Property Editor задає його властивості. Видаляти й вставляти заново не треба."
+    },
+    {
+      "id": "k7",
+      "block": 3,
+      "topic": "t_volume",
+      "topicName": "Elastic для резинки",
+      "situation": "Манжет у лекалі вужчий за рукав, але на аватарі висить трубою і не збирається на зап'ястку. Зборок немає взагалі.",
+      "ask": "Що вмикаєш?",
+      "options": [
+        "Elastic у Property Editor і налаштовуєш коефіцієнти стягування",
+        "Particle Distance — задати щільність сітки симуляції на манжеті",
+        "Render Thickness, щоб манжет став щільнішим",
+        "Layer Clone (Under), щоб додати другий шар"
+      ],
+      "correct": 0,
+      "explain": "Elastic задає фактичну довжину зрізу після стягування — це резинка, а не перекроєне лекало. Коефіцієнти в Property Editor керують силою натягу, і саме звідти беруться природні зборки на поясі й манжетах."
+    },
+    {
+      "id": "k8",
+      "block": 3,
+      "topic": "t_volume",
+      "topicName": "Render Thickness для трикотажу",
+      "situation": "Худі виглядає зшитим із паперу: край капюшона нульової товщини, тканина на рендері плоска, хоча матеріал і колір налаштовані.",
+      "ask": "Що правиш?",
+      "options": [
+        "Thickness у Property Editor — виставити 2–4 мм для трикотажу",
+        "Підняти жорсткість тканини у фізичних властивостях",
+        "Metalness/Roughness у налаштуваннях матеріалу",
+        "Fold Strength на краю капюшона"
+      ],
+      "correct": 0,
+      "explain": "Render Thickness додає матеріалу візуальну товщину — саме те, що відрізняє футер від тонкої плащівки на рендері. Робочий діапазон для трикотажу 2–4 мм, більше вже виглядає як пінопласт."
+    },
+    {
+      "id": "k10",
+      "block": 4,
+      "topic": "t_print",
+      "topicName": "Прозорий фон для принта",
+      "situation": "Наніс/-ла свій принт через Graphic — і на грудях худі з'явився із малюнком із фоном із квадратиків позаду. Сам малюнок правильний, але фону не мало б бути.",
+      "ask": "У чому річ?",
+      "options": [
+        "Файл без прозорого фону — потрібен PNG",
+        "Треба зменшити масштаб графіки в 2D-вікні",
+        "Треба призначити цій деталі окремий матеріал",
+        "Треба підняти Render Thickness під принтом"
+      ],
+      "correct": 0,
+      "explain": "Graphic накладає файл як є: якщо фон білий, він і ляже білим прямокутником. Потрібен PNG з прозорим фоном."
+    },
+    {
+      "id": "k11",
+      "block": 4,
+      "topic": "t_print",
+      "topicName": "Окремий матеріал для окремої деталі",
+      "situation": "Хотів/-ла зробити капюшон з іншої тканини — змінив/-ла матеріал, і перефарбувалося все худі разом із рукавами.",
+      "ask": "Як зробити правильно?",
+      "options": [
+        "Виділити деталі капюшона й призначити їм окремий матеріал в Object Browser",
+        "Нанести текстуру капюшона через Graphic поверх наявної",
+        "Зробити Layer Clone капюшона й пофарбувати клон",
+        "Розрізати капюшон через Cut & Sew, щоб він став окремим виробом"
+      ],
+      "correct": 0,
+      "explain": "Матеріал у CLO призначається деталям, а не виробу цілком. Якщо змінити тканину, не виділивши конкретні лекала, зміна піде на всі деталі, до яких прив'язаний цей матеріал. Створюєш у Object Browser другий матеріал, виділяєш капюшон і призначаєш його — далі колір, матовість і текстура налаштовуються для нього окремо."
+    },
+    {
+      "id": "k12",
+      "block": 4,
+      "topic": "t_layer",
+      "topicName": "Layer проти конфлікту мешів",
+      "situation": "Штани поверх худі. Низ худі й пояс штанів дрижать і проходять одне крізь одного, полігони блимають. Симуляція не заспокоюється.",
+      "ask": "Що налаштовуєш?",
+      "options": [
+        "Layer у Property Editor — задати худі значення 1, щоб воно лягло поверх штанів",
+        "Render Thickness обох виробів, щоб вони перестали перетинатися",
+        "Archive штанів на час симуляції худі",
+        "Elastic на поясі штанів, щоб він щільніше прилягав"
+      ],
+      "correct": 0,
+      "explain": "Конфлікт мешів — це коли програма не знає, що вище. Layer у Property Editor задає ієрархію: штани 0, худі 1 — тканина розводиться по шарах і перестає боротися. Коли все стало на місце, шари повертають у 0 і ресимулюють, щоб отримати реальні контакти між виробами. Archive лише сховає штани, а проблема лишиться."
+    }
+  ],
+  "homework": [
+    {
+      "id": "hw1",
+      "title": "Худі: капюшон, кишеня-кенгуру, блискавка, подвійні манжети",
+      "note": ""
+    },
+    {
+      "id": "hw2",
+      "title": "Штани зібрані, на поясі природні зборки через Elastic",
+      "note": ""
+    },
+    {
+      "id": "hw3",
+      "title": "Матеріали, кольори і Render Thickness",
+      "note": ""
+    },
+    {
+      "id": "hw4",
+      "title": "Власний принт або вишивка через Graphic",
+      "note": "PNG з прозорим фоном"
+    },
+    {
+      "id": "hw5",
+      "title": "Layer налаштовано, проникань мешів немає",
+      "note": ""
+    },
+    {
+      "id": "hw6",
+      "title": "Проєкт (.zprj) і файли графіки на Google Drive, доступ відкритий",
+      "note": "Посилання в коментар під ДЗ у LMS"
+    }
+  ],
+  "ranks": [
+    {
+      "min": 12,
+      "name": "Senior 3D Patternmaker",
+      "desc": "Дванадцять із дванадцяти. Ти бачиш не симптом, а причину — і знаєш, у якому шарі вона живе: у шві, у лекалі, у фурнітурі, у матеріалі чи в порядку шарів. Костюм у ДЗ збереш без переробок."
+    },
+    {
+      "min": 9,
+      "name": "Middle 3D Patternmaker",
+      "desc": "Симптоми читаєш упевнено, спотикаєшся на сусідніх інструментах. Перечитай розбір там, де не зійшлося: майже завжди це пара інструментів, які виглядають схоже, а роблять протилежне."
+    },
+    {
+      "min": 6,
+      "name": "Junior 3D Patternmaker",
+      "desc": "Половину дефектів упізнаєш, половину лікуєш навмання. Перед ДЗ №3 передивись позначені теми."
+    },
+    {
+      "min": 0,
+      "name": "Стажер",
+      "desc": "Поки що зшивання, фурнітура й шари зливаються в одну купу — це нормально. Прочитай розбори нижче й пройди ще раз: з другого проходу інструменти починають розрізнятися."
+    }
+  ]
+}
+</script>
+
+<div class="wrap">
+
+  <!-- ============ EDITOR ============ -->
+  <div id="editorRoot" class="hidden">
+    <div class="editbar">
+      <div class="eb-t">Режим редагування<small id="ebFile"></small></div>
+      <button class="eb-btn" id="ebPreview">Переглянути</button>
+      <button class="eb-btn" id="ebRevert">Скинути правки</button>
+      <button class="eb-btn primary" id="ebExport">Завантажити файл</button>
+      <div class="eb-status" id="ebStatus"></div>
+    </div>
+    <div class="ed-guide">
+      <b>Як це працює.</b> Правки зберігаються у твоєму браузері одразу, поки друкуєш — студенти їх не бачать.
+      <ol>
+        <li><b>Переглянути</b> — пройти гру з новими текстами.</li>
+        <li><b>Завантажити файл</b> — новий <code>.html</code> із уже вшитим змістом.</li>
+        <li>Замінити ним старий файл на сайті.</li>
+      </ol>
+      Щоб знову відкрити редактор, додай <code>?edit</code> в кінець адреси.
+    </div>
+    <div class="ed-sec">
+      <h3>Дефекти</h3>
+      <p class="ed-hint">Зелена галочка — правильний інструмент. Порядок варіантів на екрані студента перемішується автоматично.</p>
+      <div id="edSteps"></div>
+      <button class="ed-add" id="edAddStep">+ Додати дефект</button>
+    </div>
+    <div class="ed-sec">
+      <h3>Теми занять та посилання</h3>
+      <p class="ed-hint">Таймкоди на запис. Порожнє поле — назва теми покажеться просто текстом.</p>
+      <div id="edTopics"></div>
+    </div>
+    <div class="ed-sec"><h3>Чек-ліст ДЗ</h3><div id="edHomework"></div></div>
+    <div class="ed-sec">
+      <h3>Звання</h3>
+      <p class="ed-hint">«Від скількох» — мінімальна кількість вірних діагнозів.</p>
+      <div id="edRanks"></div>
+    </div>
+    <div class="ed-sec"><h3>Шапка та вступ</h3><div id="edMeta"></div></div>
+  </div>
+
+  <!-- ============ GAME ============ -->
+  <div id="gameRoot">
+
+  <div class="head">
+    <div>
+      <h1><span id="metaTitle">Брак-</span><em id="metaTitleAccent">контроль</em></h1>
+      <div class="tag sub" id="metaSubtitle"></div>
+    </div>
+    <div class="head-meta">
+      <div class="hm-cell"><span class="tag">Дефект</span><b id="hmStep">00/12</b></div>
+      <div class="hm-cell"><span class="tag">Блок</span><b id="hmBlock">—</b></div>
+    </div>
+  </div>
+
+  <div class="lampas">
+    <div class="lampas-head">
+      <span class="tag" id="lampasLabel">Оглянуто</span>
+      <span class="tag" id="lampasCount">0 / 12</span>
+    </div>
+    <div class="lampas-body"><div class="stripes" id="stripes"></div></div>
+  </div>
+
+  <!-- INTRO -->
+  <section class="panel stitched" id="screenIntro">
+    <div class="hero">
+      <div>
+        <div class="tag" id="metaEyebrow"></div>
+        <h2><span id="metaHeading"></span> <em id="metaHeadingAccent"></em></h2>
+        <p class="lead" id="metaLead"></p>
+        <div class="carelabel">
+          <div class="cl-top">
+            <div class="cl-icons">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M3 9 L21 9 L19 20 L5 20 Z" stroke="#98A0A8" stroke-width="1.4"></path>
+                <path d="M3 9 C7 4, 17 4, 21 9" stroke="#98A0A8" stroke-width="1.4" fill="none"></path>
+                <circle cx="12" cy="14.5" r="2" fill="#D8FF33"></circle>
+              </svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 3 L21 20 L3 20 Z" stroke="#98A0A8" stroke-width="1.4"></path>
+                <path d="M5 5 L19 19" stroke="#FF5A2C" stroke-width="1.6"></path>
+              </svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 17 L20 17 L18 8 L8 8 C6 8, 4 11, 4 17 Z" stroke="#98A0A8" stroke-width="1.4"></path>
+                <path d="M9 12 L15 12" stroke="#D8FF33" stroke-width="1.6"></path>
+              </svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" stroke="#98A0A8" stroke-width="1.4"></circle>
+                <path d="M8.5 12 L15.5 12" stroke="#98A0A8" stroke-width="1.4"></path>
+              </svg>
+            </div>
+            <span class="tag">Інструкція</span>
+          </div>
+          <ul id="metaRules"></ul>
+        </div>
+        <div class="ranks-row" id="metaRanks"></div>
+        <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+          <button class="btn" id="btnStart">Почати огляд</button>
+          <button class="btn ghost hidden" id="btnResume">Продовжити</button>
+        </div>
+      </div>
+      <div class="hero-art">
+        <svg viewBox="0 0 240 300" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto" aria-label="Худі з позначеними дефектами">
+          <path d="M80 66 C84 26, 156 26, 160 66 L186 80 L216 172 L188 188 L168 122 L168 248
+                   L72 248 L72 122 L52 188 L24 172 L54 80 Z" fill="#272C33" stroke="#EDEDE8" stroke-width="2" stroke-linejoin="round"></path>
+          <path d="M86 64 C94 40, 146 40, 154 64" stroke="#EDEDE8" stroke-width="1.6" fill="none"></path>
+          <path d="M120 58 L120 248" stroke="#98A0A8" stroke-width="1.4"></path>
+          <g stroke="#D8FF33" stroke-width="1.4">
+            <path d="M114 76 L126 76 M114 88 L126 88 M114 100 L126 100 M114 112 L126 112
+                     M114 124 L126 124 M114 136 L126 136 M114 148 L126 148 M114 160 L126 160"></path>
+          </g>
+          <path d="M86 176 L154 176 L158 220 L82 220 Z" stroke="#EDEDE8" stroke-width="1.6" fill="none"></path>
+          <rect x="72" y="228" width="96" height="20" fill="#D8FF33" opacity=".22" stroke="#D8FF33" stroke-width="1.4"></rect>
+          <rect x="26" y="166" width="28" height="16" fill="#D8FF33" opacity=".22" stroke="#D8FF33" stroke-width="1.4"></rect>
+          <rect x="186" y="166" width="28" height="16" fill="#D8FF33" opacity=".22" stroke="#D8FF33" stroke-width="1.4"></rect>
+          <circle cx="120" cy="48" r="16" stroke="#FF5A2C" stroke-width="1.8" stroke-dasharray="5 4" fill="none"></circle>
+          <circle cx="40" cy="174" r="16" stroke="#FF5A2C" stroke-width="1.8" stroke-dasharray="5 4" fill="none"></circle>
+          <circle cx="150" cy="198" r="15" stroke="#FF5A2C" stroke-width="1.8" stroke-dasharray="5 4" fill="none"></circle>
+          <text x="14" y="24" font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="1.6" fill="#98A0A8">QC · HOODIE FRONT</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEFECT -->
+  <section class="panel hidden" id="screenQ">
+    <div class="q-head">
+      <div class="q-num" id="qNum">01<small id="qTotal"> / 12</small></div>
+      <span class="chip" id="qBlock"></span>
+    </div>
+    <div class="tag">Симптом</div>
+    <div class="symptom" id="qSituation"></div>
+    <div class="ask" id="qAsk"></div>
+    <div class="opts" id="qOpts"></div>
+    <div class="verdict hidden" id="qVerdict">
+      <div class="vstamp" id="vStamp"></div>
+      <div class="vnote" id="vNote"></div>
+      <div class="why">
+        <div class="tag why-tag">Розбір</div>
+        <div id="vExplain"></div>
+      </div>
+      <a class="lesson-link" id="vLesson"><span>↗</span><span id="vLessonText"></span></a>
+      <div class="q-foot"><button class="btn dark" id="btnNext">Наступний дефект</button></div>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="hidden" id="screenResult">
+    <section class="panel">
+      <div class="result-top">
+        <div class="woven">
+          <div class="w-tag">Кваліфікація</div>
+          <div class="w-rank" id="rRank"></div>
+          <div class="w-score" id="rScore"></div>
+        </div>
+        <p class="rank-desc" id="rDesc"></p>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="tag" style="margin-bottom:14px">Розкладка по блоках</div>
+      <div class="bars" id="rBlocks"></div>
+    </section>
+    <section class="panel" id="rReviewPanel">
+      <div class="tag" id="rReviewTitle" style="margin-bottom:8px">Повторити</div>
+      <ul class="rev" id="rReview"></ul>
+    </section>
+    <section class="panel">
+      <div class="tag" style="margin-bottom:4px">Чек-ліст ДЗ №3</div>
+      <p style="font-size:13px;color:var(--dim);margin-bottom:6px">Відмічай по мірі виконання — збережеться.</p>
+      <div id="rHomework"></div>
+      <p id="hwDone" class="hidden" style="margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.08em;color:var(--hivis);text-transform:uppercase">✓ ДЗ №3 готове до здачі</p>
+    </section>
+    <section class="panel">
+      <div class="tag" style="margin-bottom:14px">Протокол · усі дефекти</div>
+      <table class="proto">
+        <thead><tr><th>№</th><th></th><th>Дефект</th><th>Правильний інструмент</th></tr></thead>
+        <tbody id="rProto"></tbody>
+      </table>
+    </section>
+    <div class="actions"><button class="btn" id="btnRestart">Пройти заново</button></div>
+    <div class="foot tag" id="metaFoot"></div>
+  </section>
+
+  </div>
+</div>
+
+<script>
+const PRISTINE_HTML = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+const SLUG = "clo3d-z34-brak-kontrol";
+const DRAFT_KEY = SLUG + ":draft";
+const CFG_RE = /(<script type="application\/json" id="gameConfig">)([\s\S]*?)(<\/script>)/;
+const BASE_CFG = JSON.parse(document.getElementById("gameConfig").textContent);
+let CFG = JSON.parse(JSON.stringify(BASE_CFG));
+
+const KEYS = ["А","Б","В","Г","Д","Е"];
+let state = { idx:0, answers:[], done:false, hw:{} };
+const $ = id => document.getElementById(id);
+const clone = o => JSON.parse(JSON.stringify(o));
+const esc = s => String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+function plural(n, one, few, many){
+  const a = n % 10, b = n % 100;
+  if(a === 1 && b !== 11) return one;
+  if(a >= 2 && a <= 4 && (b < 12 || b > 14)) return few;
+  return many;
+}
+function seededOrder(seed, n){
+  let s = 2166136261;
+  for(let i=0;i<seed.length;i++){ s ^= seed.charCodeAt(i); s = Math.imul(s,16777619) >>> 0; }
+  const rnd = () => { s ^= s<<13; s>>>=0; s ^= s>>>17; s ^= s<<5; s>>>=0; return s/4294967296; };
+  const a = Array.from({length:n},(_,i)=>i);
+  for(let i=n-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+const pad = n => String(n).padStart(2,"0");
+const total = () => CFG.steps.length;
+
+async function sSet(k,v){
+  try{ if(window.storage && window.storage.set){ await window.storage.set(k,v,false); return; } }catch(e){}
+  try{ localStorage.setItem(k,v); }catch(e){}
+}
+async function sGet(k){
+  try{ if(window.storage && window.storage.get){ const r=await window.storage.get(k,false); if(r&&r.value) return r.value; } }catch(e){}
+  try{ return localStorage.getItem(k); }catch(e){ return null; }
+}
+async function sDel(k){
+  try{ if(window.storage && window.storage.delete){ await window.storage.delete(k,false); } }catch(e){}
+  try{ localStorage.removeItem(k); }catch(e){}
+}
+const saveState = () => sSet(SLUG, JSON.stringify(state));
+const saveDraft = () => sSet(DRAFT_KEY, JSON.stringify(CFG));
+
+function paintStatic(){
+  document.title = CFG.meta.pageTitle || CFG.meta.title;
+  $("metaTitle").textContent = CFG.meta.title;
+  $("metaTitleAccent").textContent = CFG.meta.titleAccent || "";
+  $("metaSubtitle").textContent = CFG.meta.subtitle;
+  $("metaHeading").textContent = CFG.meta.heroHeading;
+  $("metaHeadingAccent").textContent = CFG.meta.heroHeadingAccent || "";
+  $("metaLead").textContent = CFG.meta.heroLead;
+  $("btnStart").textContent = CFG.meta.startLabel;
+  $("metaFoot").textContent = CFG.meta.footNote;
+  if(CFG.meta.lampasLabel) $("lampasLabel").textContent = CFG.meta.lampasLabel;
+  const n = total(), nb = Object.keys(CFG.blocks).filter(k => CFG.steps.some(s => String(s.block) === String(k))).length;
+  $("metaEyebrow").textContent = CFG.meta.subtitle.split("·")[0].trim() + " · " +
+    n + " " + plural(n,"дефект","дефекти","дефектів") + " · " +
+    nb + " " + plural(nb,"блок","блоки","блоків");
+  $("metaRules").innerHTML = CFG.rules.map(r => "<li>"+esc(r)+"</li>").join("");
+  const sorted = [...CFG.ranks].sort((a,b)=>a.min-b.min);
+  $("metaRanks").innerHTML = sorted.map((r,i) =>
+    '<span class="rk'+(i===sorted.length-1?' top':'')+'">'+esc(r.name)+'</span>' +
+    (i < sorted.length-1 ? '<span class="rk arrow">→</span>' : '')).join("");
+  $("qTotal").textContent = " / " + n;
+  $("lampasCount").textContent = "0 / " + n;
+  $("hmStep").textContent = "00/" + n;
+  renderStripes();
+}
+function renderStripes(){
+  let html = "";
+  for(let i = 0; i < total(); i++){
+    const a = state.answers[i];
+    let cls = "stripe";
+    if(a != null) cls += a.ok ? " on" : " no";
+    else if(i === state.idx && !state.done) cls += " cur";
+    html += '<span class="'+cls+'"></span>';
+  }
+  $("stripes").innerHTML = html;
+  const done = state.answers.filter(a => a != null).length;
+  $("lampasCount").textContent = done + " / " + total();
+}
+function show(screen){
+  ["screenIntro","screenQ","screenResult"].forEach(s => $(s).classList.toggle("hidden", s !== screen));
+}
+
+function renderStep(){
+  const st = CFG.steps[state.idx];
+  const answered = state.answers[state.idx];
+  $("hmStep").textContent = pad(state.idx+1) + "/" + total();
+  $("hmBlock").textContent = "Б" + st.block;
+  $("qNum").innerHTML = pad(state.idx+1) + '<small> / ' + total() + '</small>';
+  $("qBlock").textContent = "Блок " + st.block + " · " + (CFG.blocks[st.block] || "");
+  $("qSituation").textContent = st.situation;
+  $("qAsk").textContent = st.ask;
+
+  const box = $("qOpts"); box.innerHTML = "";
+  const order = seededOrder(st.id, st.options.length);
+  order.forEach((orig, slot) => {
+    const b = document.createElement("button");
+    b.className = "opt"; b.type = "button";
+    b.innerHTML = '<span class="key"><span>'+KEYS[slot]+'</span></span><span>'+esc(st.options[orig])+'</span>';
+    if(answered != null){
+      b.disabled = true;
+      if(orig === st.correct) b.classList.add("correct");
+      else if(orig === answered.pick) b.classList.add("wrong");
+      else b.classList.add("dim");
+    }else b.addEventListener("click", () => pick(orig));
+    box.appendChild(b);
+  });
+  if(answered != null) renderVerdict(st, answered.pick);
+  else $("qVerdict").classList.add("hidden");
+  $("btnNext").textContent = (state.idx === total()-1) ? "Закрити протокол" : "Наступний дефект";
+  renderStripes();
+  show("screenQ");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function renderVerdict(st, picked){
+  const ok = picked === st.correct;
+  const s = $("vStamp");
+  s.className = "vstamp " + (ok ? "ok" : "no");
+  s.textContent = ok ? "Діагноз вірний" : "Не той інструмент";
+  $("vNote").innerHTML = ok
+    ? 'Правильний інструмент: <b>'+esc(st.options[st.correct])+'</b>'
+    : 'Ти обрав/-ла: <b>'+esc(st.options[picked])+'</b><br>Правильно: <b>'+esc(st.options[st.correct])+'</b>';
+  $("vExplain").textContent = st.explain;
+  const T = CFG.topics[st.topic] || {title:"",url:""};
+  const link = $("vLesson");
+  $("vLessonText").textContent = T.title;
+  if(T.url){ link.href = T.url; link.target = "_blank"; link.rel = "noopener"; link.classList.remove("static"); }
+  else { link.removeAttribute("href"); link.classList.add("static"); }
+  $("qVerdict").classList.remove("hidden");
+}
+function pick(i){
+  state.answers[state.idx] = { pick:i, ok: i === CFG.steps[state.idx].correct };
+  saveState();
+  const st = CFG.steps[state.idx];
+  const order = seededOrder(st.id, st.options.length);
+  document.querySelectorAll("#qOpts .opt").forEach((b, slot) => {
+    b.disabled = true;
+    const orig = order[slot];
+    if(orig === st.correct) b.classList.add("correct");
+    else if(orig === i) b.classList.add("wrong");
+    else b.classList.add("dim");
+  });
+  renderVerdict(st, i);
+  renderStripes();
+  setTimeout(() => $("qVerdict").scrollIntoView({behavior:"smooth",block:"nearest"}), 120);
+}
+function renderHomework(){
+  const box = $("rHomework"); box.innerHTML = "";
+  CFG.homework.forEach(h => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "check-item" + (state.hw[h.id] ? " on" : "");
+    b.innerHTML = '<span class="check-box"></span><span class="check-text"><b>'+esc(h.title)+'</b>' +
+      (h.note ? '<small>'+esc(h.note)+'</small>' : '') + '</span>';
+    b.setAttribute("aria-pressed", state.hw[h.id] ? "true":"false");
+    b.addEventListener("click", () => { state.hw[h.id] = !state.hw[h.id]; saveState(); renderHomework(); });
+    box.appendChild(b);
+  });
+  $("hwDone").classList.toggle("hidden", !CFG.homework.every(h => state.hw[h.id]));
+}
+function renderResult(){
+  const score = state.answers.filter(a => a && a.ok).length;
+  const rank = [...CFG.ranks].sort((a,b)=>b.min-a.min).find(r => score >= r.min) || CFG.ranks[CFG.ranks.length-1];
+  $("rRank").textContent = rank.name;
+  $("rScore").textContent = score + " / " + total() + " " + plural(score,"вірний","вірних","вірних") + " " +
+    plural(score,"діагноз","діагнози","діагнозів");
+  $("rDesc").textContent = rank.desc;
+  $("hmStep").textContent = "ВСІ/" + total();
+  $("hmBlock").textContent = "★";
+
+  const blocks = {};
+  CFG.steps.forEach((st,i) => {
+    if(!blocks[st.block]) blocks[st.block] = {ok:0,total:0};
+    blocks[st.block].total++;
+    if(state.answers[i] && state.answers[i].ok) blocks[st.block].ok++;
+  });
+  const bb = $("rBlocks"); bb.innerHTML = "";
+  Object.keys(blocks).sort().forEach(k => {
+    const s = blocks[k], pct = (s.ok/s.total)*100;
+    const row = document.createElement("div"); row.className = "bar-row";
+    row.innerHTML = '<div><div class="bar-name"><span>Б'+k+'</span>'+esc(CFG.blocks[k]||"")+'</div>'+
+      '<div class="bar-track"><div class="bar-fill'+(pct<=34?' low':'')+'" style="width:'+pct+'%"></div></div></div>'+
+      '<div class="bar-score">'+s.ok+' з '+s.total+'</div>';
+    bb.appendChild(row);
+  });
+
+  const missed = CFG.steps.filter((st,i) => !(state.answers[i] && state.answers[i].ok));
+  const rl = $("rReview"); rl.innerHTML = "";
+  if(!missed.length){
+    $("rReviewTitle").textContent = "Повторювати нічого";
+    rl.innerHTML = '<li><span class="rv-t">Усі дефекти з першого разу. Бери ДЗ.</span></li>';
+  }else{
+    const by = {};
+    missed.forEach(st => { (by[st.topic] = by[st.topic] || []).push(st.topicName); });
+    const n = Object.keys(by).length;
+    $("rReviewTitle").textContent = "Повторити · " + n + " " + plural(n,"тема","теми","тем");
+    Object.keys(by).forEach(k => {
+      const T = CFG.topics[k] || {title:k,url:""};
+      const li = document.createElement("li");
+      li.innerHTML = (T.url
+          ? '<a class="lesson-link" style="margin-top:0" href="'+esc(T.url)+'" target="_blank" rel="noopener"><span>↗</span><span>'+esc(T.title)+'</span></a>'
+          : '<span class="rv-t">'+esc(T.title)+'</span>') +
+        '<span class="rv-w">'+esc(by[k].join(" · "))+'</span>';
+      rl.appendChild(li);
+    });
+  }
+
+  const tb = $("rProto"); tb.innerHTML = "";
+  CFG.steps.forEach((st,i) => {
+    const a = state.answers[i], ok = a && a.ok;
+    const tr = document.createElement("tr");
+    tr.innerHTML = '<td>'+pad(i+1)+'</td><td class="mk '+(ok?"ok":"no")+'">'+(ok?"✓":"✕")+'</td>'+
+      '<td>'+esc(st.topicName)+'</td><td>'+esc(st.options[st.correct])+'</td>';
+    tb.appendChild(tr);
+  });
+  renderHomework();
+  renderStripes();
+  show("screenResult");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+$("btnStart").addEventListener("click", () => {
+  state = { idx:0, answers:[], done:false, hw: state.hw||{} };
+  saveState(); renderStep();
+});
+$("btnResume").addEventListener("click", () => { state.done ? renderResult() : renderStep(); });
+$("btnNext").addEventListener("click", () => {
+  if(state.idx === total()-1){ state.done = true; saveState(); renderResult(); }
+  else { state.idx++; saveState(); renderStep(); }
+});
+$("btnRestart").addEventListener("click", async () => {
+  const hw = state.hw||{};
+  await sDel(SLUG);
+  state = { idx:0, answers:[], done:false, hw };
+  await saveState();
+  renderStripes();
+  $("btnResume").classList.add("hidden");
+  show("screenIntro");
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+
+/* ===================== EDITOR ===================== */
+const isEdit = /(\?|&)edit\b/.test(location.search) || location.hash === "#edit";
+let dirtyTimer = null;
+function markDirty(){
+  $("ebStatus").textContent = "Збереження…";
+  clearTimeout(dirtyTimer);
+  dirtyTimer = setTimeout(async () => {
+    await saveDraft();
+    const t = new Date();
+    $("ebStatus").textContent = "Чернетку збережено о " + pad(t.getHours()) + ":" + pad(t.getMinutes()) +
+      " · не забудь натиснути «Завантажити файл»";
+  }, 400);
+}
+function field(label, value, type, oninput, attrs){
+  const w = document.createElement("div"); w.className = "ed-field";
+  const l = document.createElement("label"); l.textContent = label; w.appendChild(l);
+  const el = document.createElement(type === "textarea" ? "textarea" : (type === "select" ? "select" : "input"));
+  if(type === "textarea") el.rows = (attrs && attrs.rows) || 3;
+  else if(type === "select") (attrs.options||[]).forEach(o => {
+    const op = document.createElement("option"); op.value = o.value; op.textContent = o.label; el.appendChild(op);
+  });
+  else el.type = type || "text";
+  el.value = value == null ? "" : value;
+  el.addEventListener("input", e => { oninput(e.target.value); markDirty(); });
+  w.appendChild(el); return w;
+}
+const topicOptions = () => Object.keys(CFG.topics).map(k => ({value:k,label:CFG.topics[k].title||k}));
+const blockOptions = () => Object.keys(CFG.blocks).map(k => ({value:k,label:"Блок "+k+" · "+CFG.blocks[k]}));
+function problemsOf(st){
+  const p = [];
+  if(!st.situation.trim()) p.push("порожній симптом");
+  if(!st.ask.trim()) p.push("немає питання");
+  if(st.options.filter(o=>o.trim()).length < 2) p.push("треба хоча б два варіанти");
+  if(st.correct == null || !st.options[st.correct] || !st.options[st.correct].trim()) p.push("не позначено правильний");
+  return p;
+}
+function applyValidation(card, st){
+  const p = problemsOf(st);
+  card.classList.toggle("invalid", p.length > 0);
+  let w = card.querySelector(".ed-warn");
+  if(p.length){
+    if(!w){ w = document.createElement("div"); w.className = "ed-warn"; card.appendChild(w); }
+    w.textContent = "⚠ " + p.join(" · ");
+  }else if(w) w.remove();
+}
+function renderEditorSteps(){
+  const box = $("edSteps"); box.innerHTML = "";
+  CFG.steps.forEach((st, i) => {
+    const card = document.createElement("div"); card.className = "ed-card";
+    const head = document.createElement("div"); head.className = "ed-head";
+    head.innerHTML = '<span class="ed-idx">Дефект '+pad(i+1)+'</span>';
+    const tools = document.createElement("div"); tools.className = "ed-tools";
+    const mk = (t,title,cls,fn,dis) => {
+      const b=document.createElement("button"); b.className="ed-tool"+(cls?" "+cls:"");
+      b.textContent=t; b.title=title; b.setAttribute("aria-label",title); b.disabled=!!dis;
+      b.addEventListener("click",fn); return b;
+    };
+    tools.appendChild(mk("↑","Вгору","",()=>{const s=CFG.steps;[s[i-1],s[i]]=[s[i],s[i-1]];markDirty();renderEditorSteps();},i===0));
+    tools.appendChild(mk("↓","Вниз","",()=>{const s=CFG.steps;[s[i+1],s[i]]=[s[i],s[i+1]];markDirty();renderEditorSteps();},i===CFG.steps.length-1));
+    tools.appendChild(mk("⧉","Дублювати","",()=>{const c=clone(st);c.id="k"+Date.now().toString(36);CFG.steps.splice(i+1,0,c);markDirty();renderEditorSteps();}));
+    tools.appendChild(mk("✕","Видалити","danger",()=>{if(confirm("Видалити дефект "+pad(i+1)+"?")){CFG.steps.splice(i,1);markDirty();renderEditorSteps();}}));
+    head.appendChild(tools); card.appendChild(head);
+
+    const row = document.createElement("div"); row.className = "ed-row";
+    row.appendChild(field("Блок", String(st.block), "select", v => { st.block = Number(v); }, {options:blockOptions()}));
+    row.appendChild(field("Тема заняття", st.topic, "select", v => { st.topic = v; }, {options:topicOptions()}));
+    card.appendChild(row);
+    card.appendChild(field("Коротка назва (для протоколу й списку повторення)", st.topicName, "text", v => { st.topicName = v; }));
+    card.appendChild(field("Симптом", st.situation, "textarea", v => { st.situation = v; applyValidation(card, st); }, {rows:3}));
+    card.appendChild(field("Питання", st.ask, "text", v => { st.ask = v; applyValidation(card, st); }));
+
+    const ow = document.createElement("div"); ow.className = "ed-field";
+    const lg = document.createElement("div"); lg.className = "ed-legend"; lg.textContent = "Варіанти · познач правильний";
+    ow.appendChild(lg);
+    st.options.forEach((o, oi) => {
+      const r = document.createElement("div");
+      r.className = "ed-optrow" + (st.correct === oi ? " is-correct" : "");
+      const radio = document.createElement("label"); radio.className = "ed-radio"; radio.title = "Позначити правильним";
+      const inp = document.createElement("input");
+      inp.type = "radio"; inp.name = "corr-"+i; inp.checked = st.correct === oi;
+      inp.addEventListener("change", () => {
+        st.correct = oi; markDirty();
+        ow.querySelectorAll(".ed-optrow").forEach((x,k) => x.classList.toggle("is-correct", k === oi));
+        applyValidation(card, st);
+      });
+      radio.appendChild(inp);
+      const tx = document.createElement("input"); tx.type="text"; tx.value=o;
+      tx.addEventListener("input", e => { st.options[oi] = e.target.value; markDirty(); applyValidation(card, st); });
+      const del = document.createElement("button");
+      del.className = "ed-tool danger"; del.textContent = "✕"; del.title = "Видалити варіант";
+      del.disabled = st.options.length <= 2;
+      del.addEventListener("click", () => {
+        st.options.splice(oi,1);
+        if(st.correct === oi) st.correct = 0; else if(st.correct > oi) st.correct--;
+        markDirty(); renderEditorSteps();
+      });
+      r.appendChild(radio); r.appendChild(tx); r.appendChild(del);
+      ow.appendChild(r);
+    });
+    if(st.options.length < KEYS.length){
+      const add = document.createElement("button");
+      add.className = "ed-tool"; add.textContent = "+"; add.title = "Додати варіант"; add.style.marginTop = "4px";
+      add.addEventListener("click", () => { st.options.push(""); markDirty(); renderEditorSteps(); });
+      ow.appendChild(add);
+    }
+    card.appendChild(ow);
+    card.appendChild(field("Розбір", st.explain, "textarea", v => { st.explain = v; }, {rows:4}));
+    applyValidation(card, st);
+    box.appendChild(card);
+  });
+}
+function renderEditorTopics(){
+  const box = $("edTopics"); box.innerHTML = "";
+  Object.keys(CFG.topics).forEach(k => {
+    const t = CFG.topics[k];
+    const card = document.createElement("div"); card.className = "ed-card";
+    const row = document.createElement("div"); row.className = "ed-row";
+    row.appendChild(field("Назва теми", t.title, "text", v => {
+      t.title = v;
+      document.querySelectorAll('#edSteps select option[value="'+k+'"]').forEach(op => { op.textContent = v || k; });
+    }));
+    row.appendChild(field("Посилання на запис (необов'язково)", t.url, "url", v => { t.url = v.trim(); }));
+    card.appendChild(row); box.appendChild(card);
+  });
+}
+function renderEditorHomework(){
+  const box = $("edHomework"); box.innerHTML = "";
+  CFG.homework.forEach((h,i) => {
+    const card = document.createElement("div"); card.className = "ed-card";
+    const head = document.createElement("div"); head.className = "ed-head";
+    head.innerHTML = '<span class="ed-idx">Пункт '+(i+1)+'</span>';
+    const del = document.createElement("button");
+    del.className = "ed-tool danger"; del.textContent = "✕"; del.style.marginLeft="auto";
+    del.disabled = CFG.homework.length <= 1;
+    del.addEventListener("click", () => { CFG.homework.splice(i,1); markDirty(); renderEditorHomework(); });
+    head.appendChild(del); card.appendChild(head);
+    card.appendChild(field("Назва пункту", h.title, "text", v => { h.title = v; }));
+    card.appendChild(field("Уточнення (необов'язково)", h.note, "text", v => { h.note = v; }));
+    box.appendChild(card);
+  });
+  const add = document.createElement("button");
+  add.className = "ed-add"; add.textContent = "+ Додати пункт ДЗ";
+  add.addEventListener("click", () => { CFG.homework.push({id:"h"+Date.now().toString(36),title:"",note:""}); markDirty(); renderEditorHomework(); });
+  box.appendChild(add);
+}
+function renderEditorRanks(){
+  const box = $("edRanks"); box.innerHTML = "";
+  CFG.ranks.forEach(r => {
+    const card = document.createElement("div"); card.className = "ed-card";
+    const row = document.createElement("div"); row.className = "ed-row";
+    row.appendChild(field("Від скількох вірних", r.min, "number", v => { r.min = Number(v)||0; }));
+    row.appendChild(field("Назва звання", r.name, "text", v => { r.name = v; }));
+    card.appendChild(row);
+    card.appendChild(field("Опис", r.desc, "textarea", v => { r.desc = v; }, {rows:3}));
+    box.appendChild(card);
+  });
+}
+function renderEditorMeta(){
+  const box = $("edMeta"); box.innerHTML = "";
+  const card = document.createElement("div"); card.className = "ed-card";
+  const m = CFG.meta;
+  const row = document.createElement("div"); row.className = "ed-row";
+  row.appendChild(field("Заголовок (біла частина)", m.title, "text", v => { m.title = v; }));
+  row.appendChild(field("Заголовок (кислотна частина)", m.titleAccent||"", "text", v => { m.titleAccent = v; }));
+  card.appendChild(row);
+  card.appendChild(field("Підзаголовок", m.subtitle, "text", v => { m.subtitle = v; }));
+  const row2 = document.createElement("div"); row2.className = "ed-row";
+  row2.appendChild(field("Заголовок екрана (біла частина)", m.heroHeading, "text", v => { m.heroHeading = v; }));
+  row2.appendChild(field("Заголовок екрана (кислотна частина)", m.heroHeadingAccent||"", "text", v => { m.heroHeadingAccent = v; }));
+  card.appendChild(row2);
+  card.appendChild(field("Вступний текст", m.heroLead, "textarea", v => { m.heroLead = v; }, {rows:4}));
+  card.appendChild(field("Напис на кнопці старту", m.startLabel, "text", v => { m.startLabel = v; }));
+  card.appendChild(field("Підпис над лампасом", m.lampasLabel||"", "text", v => { m.lampasLabel = v; }));
+  card.appendChild(field("Підпис унизу результатів", m.footNote, "text", v => { m.footNote = v; }));
+  card.appendChild(field("Назва вкладки браузера", m.pageTitle||"", "text", v => { m.pageTitle = v; document.title = v; }));
+  const rw = document.createElement("div"); rw.className = "ed-field";
+  const lg = document.createElement("div"); lg.className = "ed-legend"; lg.textContent = "Пункти інструкції на етикетці";
+  rw.appendChild(lg);
+  CFG.rules.forEach((r,i) => {
+    const line = document.createElement("div");
+    line.style.cssText = "display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:7px";
+    const tx = document.createElement("input"); tx.type="text"; tx.value=r;
+    tx.addEventListener("input", e => { CFG.rules[i] = e.target.value; markDirty(); });
+    const del = document.createElement("button");
+    del.className="ed-tool danger"; del.textContent="✕";
+    del.addEventListener("click", () => { CFG.rules.splice(i,1); markDirty(); renderEditorMeta(); });
+    line.appendChild(tx); line.appendChild(del); rw.appendChild(line);
+  });
+  const add = document.createElement("button");
+  add.className="ed-tool"; add.textContent="+"; add.title="Додати пункт";
+  add.addEventListener("click", () => { CFG.rules.push(""); markDirty(); renderEditorMeta(); });
+  rw.appendChild(add); card.appendChild(rw); box.appendChild(card);
+}
+function renderEditor(){
+  $("ebFile").textContent = CFG.meta.fileName;
+  renderEditorSteps(); renderEditorTopics(); renderEditorHomework(); renderEditorRanks(); renderEditorMeta();
+}
+$("edAddStep").addEventListener("click", () => {
+  CFG.steps.push({
+    id:"k"+Date.now().toString(36), block:Number(Object.keys(CFG.blocks)[0])||1,
+    topic:Object.keys(CFG.topics)[0]||"", topicName:"", situation:"", ask:"Що робиш?",
+    options:["","","",""], correct:0, explain:""
+  });
+  markDirty(); renderEditorSteps();
+  const cards = document.querySelectorAll("#edSteps .ed-card");
+  const last = cards[cards.length-1];
+  if(last){ last.scrollIntoView({behavior:"smooth",block:"center"}); const ta = last.querySelector("textarea"); if(ta) ta.focus(); }
+});
+function buildFile(){
+  const json = JSON.stringify(CFG, null, 2).replace(/</g, "\\u003c");
+  if(!CFG_RE.test(PRISTINE_HTML)) return null;
+  return PRISTINE_HTML.replace(CFG_RE, (m,a,b,c) => a + "\n" + json + "\n" + c);
+}
+$("ebExport").addEventListener("click", () => {
+  const bad = CFG.steps.findIndex(s => problemsOf(s).length > 0);
+  if(bad >= 0 && !confirm("У дефекті "+pad(bad+1)+" є незаповнені поля. Все одно завантажити?")) return;
+  const html = buildFile();
+  if(!html){ alert("Не вдалося зібрати файл."); return; }
+  const blob = new Blob([html], {type:"text/html;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = CFG.meta.fileName || "gra.html";
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  $("ebStatus").textContent = "Файл зібрано. Заміни ним старий на сайті.";
+});
+$("ebPreview").addEventListener("click", () => {
+  const bad = CFG.steps.findIndex(s => problemsOf(s).length > 0);
+  if(bad >= 0){ alert("У дефекті "+pad(bad+1)+" не позначено правильний варіант або порожні поля."); return; }
+  location.href = location.pathname + location.search.replace(/[?&]edit\b/,"").replace(/^&/,"?");
+});
+$("ebRevert").addEventListener("click", async () => {
+  if(!confirm("Скинути всі правки до текстів, збережених у файлі?")) return;
+  await sDel(DRAFT_KEY); CFG = clone(BASE_CFG); renderEditor();
+  $("ebStatus").textContent = "Правки скинуто до версії з файлу.";
+});
+
+(async function init(){
+  const draft = await sGet(DRAFT_KEY);
+  if(draft){
+    try{ const d = JSON.parse(draft); if(d && Array.isArray(d.steps) && d.steps.length) CFG = d; }catch(e){}
+  }
+  if(isEdit){
+    $("gameRoot").classList.add("hidden");
+    $("editorRoot").classList.remove("hidden");
+    $("ebStatus").textContent = draft
+      ? "Показано збережену чернетку. Готово — натисни «Завантажити файл»."
+      : "Тексти взято з файлу. Правки зберігаються автоматично.";
+    renderEditor(); return;
+  }
+  paintStatic();
+  const saved = await sGet(SLUG);
+  if(saved){
+    try{
+      const s = JSON.parse(saved);
+      if(s && Array.isArray(s.answers)){
+        state = { idx: Math.min(s.idx||0, total()-1), answers: s.answers.slice(0,total()), done: !!s.done, hw: s.hw||{} };
+        renderStripes();
+        if(state.answers.filter(a=>a!=null).length > 0){
+          $("btnResume").classList.remove("hidden");
+          $("btnResume").textContent = state.done ? "Показати результат" : "Продовжити з " + pad(state.idx+1);
+          $("btnStart").textContent = "Почати заново";
+          $("btnStart").classList.remove("btn");
+          $("btnStart").className = "btn ghost";
+          $("btnResume").className = "btn";
+        }
+      }
+    }catch(e){}
+  }
+})();
+</script></body></html>
